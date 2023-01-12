@@ -11,7 +11,7 @@ use starknet_api::transaction::{EventKey, TransactionHash, TransactionOffsetInBl
 
 use crate::block::Block;
 use crate::state::{ContractClass, StateUpdate};
-use crate::transaction::{Event, TransactionReceiptWithStatus, TransactionWithType};
+use crate::transaction::{Event, InvokeTransaction, TransactionReceiptWithStatus, TransactionWithType};
 
 #[derive(Copy, Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum Tag {
@@ -179,4 +179,7 @@ pub trait JsonRpc {
     /// Returns all events matching the given filter.
     #[method(name = "getEvents")]
     fn get_events(&self, filter: EventFilter) -> Result<EventsChunk, Error>;
+
+    #[method(name = "addInvokeTransaction")]
+    fn add_invoke_transaction(&self, invoke_transaction: InvokeTransaction) -> Result<TransactionHash, Error>;
 }

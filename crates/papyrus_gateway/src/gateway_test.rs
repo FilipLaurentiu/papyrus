@@ -9,9 +9,6 @@ use jsonrpsee::http_server::types::error::CallError;
 use jsonrpsee::types::error::ErrorObject;
 use jsonrpsee::types::EmptyParams;
 use jsonschema::JSONSchema;
-use papyrus_storage::header::HeaderStorageWriter;
-use papyrus_storage::test_utils::get_test_storage;
-use papyrus_storage::{BodyStorageWriter, EventIndex, StateStorageWriter, TransactionIndex};
 use starknet_api::block::{BlockHash, BlockHeader, BlockNumber, BlockStatus};
 use starknet_api::core::{ClassHash, ContractAddress, Nonce, PatriciaKey};
 use starknet_api::hash::{StarkFelt, StarkHash};
@@ -20,6 +17,10 @@ use starknet_api::transaction::{
     EventIndexInTransactionOutput, EventKey, Transaction, TransactionHash, TransactionOffsetInBlock,
 };
 use starknet_api::{patky, shash};
+
+use papyrus_storage::header::HeaderStorageWriter;
+use papyrus_storage::test_utils::get_test_storage;
+use papyrus_storage::{BodyStorageWriter, EventIndex, StateStorageWriter, TransactionIndex};
 use test_utils::{
     get_rand_test_block_with_events, get_rand_test_body_with_events, get_rng, get_test_block,
     get_test_state_diff, GetTestInstance,
@@ -36,8 +37,8 @@ use crate::test_utils::{
     send_request,
 };
 use crate::transaction::{
-    Event, TransactionOutput, TransactionReceipt, TransactionReceiptWithStatus, TransactionStatus,
-    TransactionWithType, Transactions,
+    Event, InvokeTransactionV1, TransactionOutput, TransactionReceipt,
+    TransactionReceiptWithStatus, TransactionStatus, TransactionWithType, Transactions,
 };
 use crate::{run_server, ContinuationTokenAsStruct};
 
@@ -1287,7 +1288,17 @@ async fn get_events_chunk_size_2_without_address() {
 }
 
 #[tokio::test]
-async fn run_server_scneario() {
+async fn add_invoke_transaction_successfully() {
+    let (module, mut storage_writer) = get_test_rpc_server_and_storage_writer();
+    let invoke_transaction = InvokeTransactionV1::default();
+    let res = module
+        .call::<_, TransactionHash>("starknet_addInvokeTransaction", [invoke_transaction])
+        .await
+        .unwrap();
+}
+
+#[tokio::test]
+async fn run_server_scenario() {
     let (storage_reader, _) = get_test_storage();
     let gateway_config = get_test_gateway_config();
     let (addr, _handle) = run_server(&gateway_config, storage_reader).await.unwrap();

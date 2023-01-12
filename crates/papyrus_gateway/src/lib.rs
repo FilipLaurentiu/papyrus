@@ -36,10 +36,7 @@ use crate::api::{
 };
 use crate::block::{Block, BlockHeader};
 use crate::state::{ContractClass, StateUpdate};
-use crate::transaction::{
-    Event, Transaction, TransactionOutput, TransactionReceipt, TransactionReceiptWithStatus,
-    TransactionStatus, TransactionWithType, Transactions,
-};
+use crate::transaction::{Event, Transaction, TransactionOutput, TransactionReceipt, TransactionReceiptWithStatus, TransactionStatus, TransactionWithType, Transactions, InvokeTransaction};
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct GatewayConfig {
@@ -490,6 +487,11 @@ impl JsonRpcServer for JsonRpcServerImpl {
         }
 
         Ok(EventsChunk { events: filtered_events, continuation_token: None })
+    }
+
+
+    fn add_invoke_transaction(&self, invoke_transaction : InvokeTransaction) -> Result<TransactionHash, Error> {
+        unimplemented!()
     }
 }
 
